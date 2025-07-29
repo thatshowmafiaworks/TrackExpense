@@ -6,7 +6,7 @@ using Serilog;
 using System.Text;
 using TrackExpense.Api.Seed;
 using TrackExpense.Api.Services;
-using TrackExpense.Application.Contracts;
+using TrackExpense.Application.Interfaces;
 using TrackExpense.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);

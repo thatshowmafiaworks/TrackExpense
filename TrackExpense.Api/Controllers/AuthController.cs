@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TrackExpense.Api.Contracts.Auth;
-using TrackExpense.Application.Contracts;
+using TrackExpense.Application.Interfaces;
 
 namespace TrackExpense.Api.Controllers
 {

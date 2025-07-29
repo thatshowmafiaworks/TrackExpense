@@ -24,4 +24,9 @@
     <Folder Include="Seed\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrackExpense.Application\TrackExpense.Application.csproj" />
+    <ProjectReference Include="..\TrackExpense.Domain\TrackExpense.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
