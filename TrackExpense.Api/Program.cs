@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using TrackExpense.Api.Seed;
 using TrackExpense.Api.Services;
 using TrackExpense.Application.Contracts;
 using TrackExpense.Infrastructure.Data;
@@ -61,6 +62,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Seed data
+using (var scope = app.Services.CreateScope())
+{
+    await AuthSeeder.SeedRoles(scope.ServiceProvider);
+    await AuthSeeder.SeedAdmin(scope.ServiceProvider);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

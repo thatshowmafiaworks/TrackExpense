@@ -8,7 +8,5 @@ namespace TrackExpense.Infrastructure.Data
         public AppDbContext(DbContextOptions options) : base(options)
         {
         }
-
-
     }
 }
