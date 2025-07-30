@@ -201,7 +201,5 @@ namespace TrackExpense.Tests.Repositories
             Assert.Null(noCat);
             Assert.True(dbContext.Categories.Count() == 0);
         }
-
-
     }
 }
