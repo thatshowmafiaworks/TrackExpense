@@ -10,5 +10,7 @@
         public string? Description { get; set; }
         public string CategoryId { get; set; }
         public Category Category { get; set; } = default!;
+        public string AccountId { get; set; }
+        public Account Account { get; set; }
     }
 }

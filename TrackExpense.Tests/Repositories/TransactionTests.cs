@@ -25,7 +25,8 @@ namespace TrackExpense.Tests.Repositories
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             };
 
             await dbContext.Transactions.AddAsync(trans);
@@ -50,19 +51,22 @@ namespace TrackExpense.Tests.Repositories
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             },
                 new Transaction
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             },
                 new Transaction
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             }
             }.OrderBy(x => x.Id).ToList();
 
@@ -94,25 +98,29 @@ namespace TrackExpense.Tests.Repositories
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = userId,
-                    CategoryId = Guid.NewGuid().ToString()
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString()
                 },
                 new Transaction
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = userId,
-                    CategoryId = Guid.NewGuid().ToString()
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString()
                 },
                 new Transaction
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = userId,
-                    CategoryId = Guid.NewGuid().ToString()
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString()
                 },
                 new Transaction
                 {
                     Id = Guid.NewGuid().ToString(),
                     UserId = Guid.NewGuid().ToString(),
-                    CategoryId = Guid.NewGuid().ToString()
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString()
                 }
             }.OrderBy(x => x.Id).ToList();
 
@@ -130,6 +138,60 @@ namespace TrackExpense.Tests.Repositories
             {
                 Assert.NotNull(results[i]);
                 Assert.Equal(userId, results[i].UserId);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllTransactionsForAccount()
+        {
+            // Arrange
+            var dbContext = GetInMemoryContext();
+            var accountId = Guid.NewGuid().ToString();
+            var trans = new List<Transaction> {
+                new Transaction
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = Guid.NewGuid().ToString(),
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = accountId,
+                },
+                new Transaction
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = Guid.NewGuid().ToString(),
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = accountId,
+                },
+                new Transaction
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = Guid.NewGuid().ToString(),
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString(),
+                },
+                new Transaction
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = Guid.NewGuid().ToString(),
+                    CategoryId = Guid.NewGuid().ToString(),
+                    AccountId = Guid.NewGuid().ToString(),
+                }
+            }.OrderBy(x => x.Id).ToList();
+
+            await dbContext.Transactions.AddRangeAsync(trans);
+            await dbContext.SaveChangesAsync();
+
+            var repo = new TransactionRepository(dbContext);
+            // Act
+            var results = (await repo.GetAllForAccount(accountId)).OrderBy(x => x.Id).ToList();
+            // Assert
+            trans = trans.Where(x => x.AccountId == accountId).ToList();
+            Assert.NotEmpty(results);
+            Assert.True(results.Count() == trans.Count);
+            for (int i = 0; i < results.Count; i++)
+            {
+                Assert.NotNull(results[i]);
+                Assert.Equal(accountId, results[i].AccountId);
             }
         }
 
@@ -156,7 +218,8 @@ namespace TrackExpense.Tests.Repositories
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             };
 
             await dbContext.Transactions.AddAsync(trans);
@@ -183,7 +246,8 @@ namespace TrackExpense.Tests.Repositories
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             };
             await repo.Add(trans);
             await repo.Save();
@@ -205,6 +269,7 @@ namespace TrackExpense.Tests.Repositories
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
                 CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             };
             await dbContext.Transactions.AddAsync(oldTrans);
             await dbContext.SaveChangesAsync();
@@ -236,7 +301,8 @@ namespace TrackExpense.Tests.Repositories
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = Guid.NewGuid().ToString(),
-                CategoryId = Guid.NewGuid().ToString()
+                CategoryId = Guid.NewGuid().ToString(),
+                AccountId = Guid.NewGuid().ToString()
             };
             await dbContext.Transactions.AddAsync(trans);
             await dbContext.SaveChangesAsync();

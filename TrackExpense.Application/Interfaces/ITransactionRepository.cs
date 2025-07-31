@@ -6,6 +6,7 @@ namespace TrackExpense.Application.Interfaces
     {
         Task<List<Transaction>> GetAll();
         Task<List<Transaction>> GetAllForUser(string id);
+        Task<List<Transaction>> GetAllForAccount(string accountId);
         Task<Transaction?> Get(string id);
         Task Add(Transaction transaction);
         void Update(Transaction transaction);

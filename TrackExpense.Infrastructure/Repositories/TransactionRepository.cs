@@ -23,6 +23,9 @@ namespace TrackExpense.Infrastructure.Repositories
         public async Task<List<Transaction>> GetAllForUser(string id)
             => await _dbContext.Transactions.Where(t => t.UserId == id).ToListAsync();
 
+        public async Task<List<Transaction>> GetAllForAccount(string accountId)
+            => await _dbContext.Transactions.Where(t => t.AccountId == accountId).ToListAsync();
+
         public async Task Add(Transaction transaction)
             => await _dbContext.Transactions.AddAsync(transaction);
 
