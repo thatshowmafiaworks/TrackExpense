@@ -120,6 +120,52 @@ namespace TrackExpense.Tests.Repositories
         }
 
         [Fact]
+        public async Task GetAllByUserId()
+        {
+            // Arrange
+            var dbContext = GetInMemoryContext();
+            var userId = Guid.NewGuid().ToString();
+            var cats = new List<Category>
+            {
+                new Category
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Food",
+                    UserId = userId
+                },
+                new Category
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Food",
+                    UserId = userId
+                },
+                new Category
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Food",
+                    UserId = userId
+                },
+                new Category
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Food",
+                    UserId = Guid.NewGuid().ToString()
+                }
+            };
+
+            await dbContext.Categories.AddRangeAsync(cats);
+            await dbContext.SaveChangesAsync();
+
+            var repo = new CategoryRepository(dbContext);
+            // Act
+            var result = await repo.GetAllByUserId(userId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(3, result.Count);
+        }
+
+        [Fact]
         public async Task AddsNewCategory()
         {
             // Arrange

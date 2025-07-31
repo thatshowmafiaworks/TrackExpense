@@ -20,6 +20,9 @@ namespace TrackExpense.Infrastructure.Repositories
         public async Task<List<Category>> GetAll()
             => await _dbContext.Categories.ToListAsync();
 
+        public async Task<List<Category>> GetAllByUserId(string userId)
+            => await _dbContext.Categories.Where(x => x.UserId == userId).ToListAsync();
+
         public async Task Add(Category category)
             => await _dbContext.Categories.AddAsync(category);
 

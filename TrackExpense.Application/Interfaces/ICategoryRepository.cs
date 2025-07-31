@@ -6,6 +6,7 @@ namespace TrackExpense.Application.Interfaces
     {
         Task<List<Category>> GetAll();
         Task<Category?> Get(string id);
+        Task<List<Category>> GetAllByUserId(string userId);
         Task Add(Category category);
         void Update(Category category);
         void Remove(Category category);

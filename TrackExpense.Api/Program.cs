@@ -8,6 +8,7 @@ using TrackExpense.Api.Seed;
 using TrackExpense.Api.Services;
 using TrackExpense.Application.Interfaces;
 using TrackExpense.Infrastructure.Data;
+using TrackExpense.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,7 @@ builder.Services.AddAuthentication(opts =>
         });
 // Adding service to generate jwt tokens fro authorizations/authentications
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
