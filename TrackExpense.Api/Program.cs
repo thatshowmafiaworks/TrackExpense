@@ -57,6 +57,7 @@ builder.Services.AddAuthentication(opts =>
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IAccountRepository, AccountRepository>();
+builder.Services.AddTransient<ITransactionRepository, TransactionRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
