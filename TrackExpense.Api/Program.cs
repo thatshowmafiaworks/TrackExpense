@@ -56,6 +56,7 @@ builder.Services.AddAuthentication(opts =>
 // Adding service to generate jwt tokens fro authorizations/authentications
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
+builder.Services.AddTransient<IAccountRepository, AccountRepository>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
