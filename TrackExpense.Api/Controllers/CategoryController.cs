@@ -202,7 +202,7 @@ namespace TrackExpense.Api.Controllers
                     return Unauthorized("Something went wrong, try again later please");
                 }
 
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                if (!await _userManager.IsInRoleAsync(user, "Admin"))
                 {
                     _logger.LogWarning($"User '{user.Id}' without permissions tried to delete category with id:'{id}'");
                     return StatusCode(403, $"You dont have permisions to delete '{id}'");
