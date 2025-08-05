@@ -112,9 +112,8 @@ namespace TrackExpense.Infrastructure.Services
 
         private bool InSameMonth(DateTime a, DateOnly b)
         {
-            var aFirstDayOfMonth = a.AddDays(-a.Day + 1);
-            var bFirstDayOfMonth = b.AddDays(-b.Day + 1);
-            return DateOnly.FromDateTime(aFirstDayOfMonth) == bFirstDayOfMonth;
+            if (a.Year == b.Year && a.Month == b.Month) return true;
+            return false;
         }
     }
 }
