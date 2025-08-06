@@ -6,9 +6,11 @@ using Serilog;
 using System.Text;
 using TrackExpense.Api.Seed;
 using TrackExpense.Api.Services;
+using TrackExpense.Api.Services.Seed;
 using TrackExpense.Application.Interfaces;
 using TrackExpense.Infrastructure.Data;
 using TrackExpense.Infrastructure.Repositories;
+using TrackExpense.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,11 +55,12 @@ builder.Services.AddAuthentication(opts =>
                 ValidateLifetime = true
             };
         });
-// Adding service to generate jwt tokens fro authorizations/authentications
+// Adding services to generate jwt tokens fro authorizations/authentications
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddTransient<ICategoryRepository, CategoryRepository>();
 builder.Services.AddTransient<IAccountRepository, AccountRepository>();
 builder.Services.AddTransient<ITransactionRepository, TransactionRepository>();
+builder.Services.AddTransient<IReportService, ReportService>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
@@ -72,6 +75,7 @@ using (var scope = app.Services.CreateScope())
 {
     await AuthSeeder.SeedRoles(scope.ServiceProvider);
     await AuthSeeder.SeedAdmin(scope.ServiceProvider);
+    await CategoriesSeeder.SeedCategories(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
