@@ -264,6 +264,201 @@ namespace TrackExpense.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task TopNExpenses()
+        {
+            // Arrange
+            var dbContext = GetInMemoryContext();
+            var userId = Guid.NewGuid().ToString();
+            var cat = new Category
+            {
+                Id = 1.ToString(),
+                Name = "Food",
+                UserId = userId
+            };
+            await dbContext.Categories.AddAsync(cat);
+
+            var account = new Account
+            {
+                Id = 1.ToString(),
+                Name = "Card",
+                UserId = userId
+            };
+            await dbContext.Accounts.AddAsync(account);
+
+            var transactions = new List<Transaction>();
+            for (int i = 1; i <= 20; i++)
+            {
+                var transaction = new Transaction
+                {
+                    Id = i.ToString(),
+                    UserId = userId,
+                    Amount = i * 100,
+                    TransactionType = TransactionType.Expense,
+                    Date = DateTime.Today.AddDays(-i + 1),
+                    CategoryId = cat.Id,
+                    AccountId = account.Id
+                };
+                transactions.Add(transaction);
+            }
+            await dbContext.Transactions.AddRangeAsync(transactions);
+
+            await dbContext.SaveChangesAsync();
+
+
+            IReportService reportService = new ReportService(
+                new CategoryRepository(dbContext),
+                new AccountRepository(dbContext),
+                new TransactionRepository(dbContext)
+                );
+            // Act
+            var results1 = await reportService.TopNExpenses(
+                userId,
+                DateTime.UtcNow.AddDays(-200),
+                DateTime.UtcNow
+                );
+            var results2 = await reportService.TopNExpenses(
+                userId,
+                DateTime.UtcNow.AddDays(-200),
+                DateTime.UtcNow,
+                nItems: 5
+                );
+            // Assert
+            Assert.NotNull(results1);
+            Assert.NotNull(results2);
+
+            Assert.NotEmpty(results1);
+            Assert.NotEmpty(results2);
+            Assert.Equal(20, results1.Count);
+            Assert.Equal(5, results2.Count);
+            var data1 = transactions.OrderByDescending(x => x.Amount).Take(20).ToList();
+            var data2 = transactions.OrderByDescending(x => x.Amount).Take(5).ToList();
+            for (int i = 0; i < results1.Count; i++)
+            {
+                Assert.NotNull(results1[i]);
+                Assert.Equal(data1[i].Id, results1[i].Id);
+            }
+            for (int i = 0; i < results2.Count; i++)
+            {
+                Assert.NotNull(results2[i]);
+                Assert.Equal(data2[i].Id, results2[i].Id);
+            }
+        }
+
+        [Fact]
+        public async Task CategoriesAndPercents()
+        {
+            // Arrange
+            var dbContext = GetInMemoryContext();
+            var userId = Guid.NewGuid().ToString();
+            var cats = new List<Category>
+            {
+                new Category
+                {
+                    Id = 1.ToString(),
+                    Name = "Food",
+                    UserId = userId
+                },
+                new Category
+                {
+                    Id = 2.ToString(),
+                    Name = "Rent",
+                    UserId = userId
+                },
+                new Category
+                {
+                    Id = 3.ToString(),
+                    Name = "Health",
+                    UserId = userId
+                }
+            };
+            await dbContext.Categories.AddRangeAsync(cats);
+
+            var account = new Account
+            {
+                Id = 1.ToString(),
+                Name = "Card",
+                UserId = userId
+            };
+            await dbContext.Accounts.AddAsync(account);
+
+            var transactions = new List<Transaction>();
+            for (int i = 1; i <= 5; i++)
+            {
+                var transaction = new Transaction
+                {
+                    Id = i.ToString(),
+                    UserId = userId,
+                    Amount = 100,
+                    TransactionType = TransactionType.Expense,
+                    Date = DateTime.Today.AddDays(-i + 1),
+                    CategoryId = 1.ToString(),
+                    AccountId = account.Id
+                };
+                transactions.Add(transaction);
+            }
+            for (int i = 6; i <= 8; i++)
+            {
+                var transaction = new Transaction
+                {
+                    Id = i.ToString(),
+                    UserId = userId,
+                    Amount = 100,
+                    TransactionType = TransactionType.Expense,
+                    Date = DateTime.Today.AddDays(-i + 1),
+                    CategoryId = 2.ToString(),
+                    AccountId = account.Id
+                };
+                transactions.Add(transaction);
+            }
+            for (int i = 9; i <= 10; i++)
+            {
+                var transaction = new Transaction
+                {
+                    Id = i.ToString(),
+                    UserId = userId,
+                    Amount = 100,
+                    TransactionType = TransactionType.Expense,
+                    Date = DateTime.Today.AddDays(-i + 1),
+                    CategoryId = 3.ToString(),
+                    AccountId = account.Id
+                };
+                transactions.Add(transaction);
+            }
+            await dbContext.Transactions.AddRangeAsync(transactions);
+
+            await dbContext.SaveChangesAsync();
+
+
+            IReportService reportService = new ReportService(
+                new CategoryRepository(dbContext),
+                new AccountRepository(dbContext),
+                new TransactionRepository(dbContext)
+                );
+            // Act
+            var result = await reportService.CategoryExpensesAsPercents(
+                userId,
+                DateTime.UtcNow.AddDays(-200),
+                DateTime.UtcNow
+                );
+            // Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+            Assert.Equal(3, result.Count());
+            var sum = transactions.Sum(x => x.Amount);
+            Assert.Equal(sum, result.Sum(x => x.Total));
+            Assert.Equal(100, result.Sum(x => x.Percents));
+            foreach (var test in result)
+            {
+                Assert.NotNull(test);
+                var sumPerCategory = transactions.Where(x => x.CategoryId == test.CategoryId)
+                    .Sum(x => x.Amount);
+                Assert.Equal(sumPerCategory, test.Total);
+                var percent = sumPerCategory / sum * 100;
+                Assert.Equal(percent, test.Percents);
+            }
+        }
+
         private bool InSameMonth(DateTime a, DateOnly b)
         {
             if (a.Year == b.Year && a.Month == b.Month) return true;

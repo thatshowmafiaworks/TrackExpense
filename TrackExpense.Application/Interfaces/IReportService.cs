@@ -1,4 +1,5 @@
 ﻿using TrackExpense.Application.Dtos;
+using TrackExpense.Domain.Entities;
 
 namespace TrackExpense.Application.Interfaces
 {
@@ -12,5 +13,20 @@ namespace TrackExpense.Application.Interfaces
             string userId,
             string accountId = "",
             int monthsCount = 12);
+
+        Task<List<Transaction>> TopNExpenses(
+            string userId,
+            DateTime startDate,
+            DateTime endDate,
+            string accountId = "",
+            int nItems = 0
+            );
+
+        Task<List<CategoryAndPercent>> CategoryExpensesAsPercents(
+            string userId,
+            DateTime startDate,
+            DateTime endDate,
+            string accountId = ""
+            );
     }
 }

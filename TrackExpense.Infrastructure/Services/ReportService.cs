@@ -108,6 +108,72 @@ namespace TrackExpense.Infrastructure.Services
             return result;
         }
 
+        public async Task<List<Transaction>> TopNExpenses(
+            string userId,
+            DateTime startDate,
+            DateTime endDate,
+            string accountId = "",
+            int nItems = 0)
+        {
+            List<Transaction> result;
+            if (endDate > DateTime.UtcNow) endDate = DateTime.UtcNow;
+            if (string.IsNullOrWhiteSpace(accountId))
+            {
+                result = await _transRepo.GetAllForUser(userId);
+            }
+            else
+            {
+                result = await _transRepo.GetAllForAccount(accountId);
+            }
+            result = result
+                .Where(x => x.TransactionType == TransactionType.Expense)
+                .Where(x => x.Date >= startDate && x.Date <= endDate)
+                .OrderByDescending(x => x.Amount)
+                .ToList();
+            if (nItems == 0)
+            {
+                return result;
+            }
+            return result.Take(nItems).ToList();
+        }
+
+        public async Task<List<CategoryAndPercent>> CategoryExpensesAsPercents(
+            string userId,
+            DateTime startDate,
+            DateTime endDate,
+            string accountId = ""
+            )
+        {
+            List<Transaction> transactions;
+            if (endDate > DateTime.UtcNow) endDate = DateTime.UtcNow;
+            if (string.IsNullOrWhiteSpace(accountId))
+            {
+                transactions = await _transRepo.GetAllForUser(userId);
+            }
+            else
+            {
+                transactions = await _transRepo.GetAllForAccount(accountId);
+            }
+
+            transactions = transactions
+                .Where(x => x.TransactionType == TransactionType.Expense)
+                .Where(x => x.Date >= startDate && x.Date <= endDate)
+                .ToList();
+            var categories = await _categoryRepo.GetAll();
+            var totalNumber = transactions.Sum(x => x.Amount);
+            var result = transactions
+                .GroupBy(x => x.CategoryId)
+                .Select(x => new CategoryAndPercent
+                {
+                    CategoryId = x.Key,
+                    CategoryName = categories.First(y => y.Id == x.Key).Name,
+                    Total = x.Sum(y => y.Amount),
+                    Percents = (x.Sum(y => y.Amount)) / totalNumber * 100
+                })
+                .OrderByDescending(x => x.Percents);
+            return result.ToList();
+        }
+
         private string Month(int month) => new DateTime(1, month, 1).ToString("MMMM", new CultureInfo("en_US"));
 
         private bool InSameMonth(DateTime a, DateOnly b)
@@ -115,5 +181,7 @@ namespace TrackExpense.Infrastructure.Services
             if (a.Year == b.Year && a.Month == b.Month) return true;
             return false;
         }
+
+
     }
 }
