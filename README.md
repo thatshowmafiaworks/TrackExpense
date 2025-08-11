@@ -100,4 +100,4 @@ dotnet test
 
 ---
 
-###### Generated via ChatGpt, reviewed by me:)
+###### 'Readme.md' generated via ChatGpt, reviewed by me:)
